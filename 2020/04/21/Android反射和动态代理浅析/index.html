@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android,java," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="提纲 java反射基础 反射在Android中的应用 Java动态代理 动态代理在Android的应用  java反射基础相关定义和简单调用 java反射官方说明链接 Java允许程序在运行时透过Reflection APIs加载一个运行时才得知名称的class，获得其完整结构，包括其modifiers（诸如public, static 等）、superclass（例如Object）、实现之i">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android反射和动态代理浅析">
+<meta property="og:url" content="https://whytry-gar.github.io/2020/04/21/Android%E5%8F%8D%E5%B0%84%E5%92%8C%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E6%B5%85%E6%9E%90/index.html">
+<meta property="og:site_name" content="wizard。">
+<meta property="og:description" content="提纲 java反射基础 反射在Android中的应用 Java动态代理 动态代理在Android的应用  java反射基础相关定义和简单调用 java反射官方说明链接 Java允许程序在运行时透过Reflection APIs加载一个运行时才得知名称的class，获得其完整结构，包括其modifiers（诸如public, static 等）、superclass（例如Object）、实现之i">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-a489726f6cae09e8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-be2720e3b7e993e5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-4d3d861462ba3716.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-91109f82af411f5d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-f502173dcfe4bf3f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-81dd312f525f9f4c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-4c3ecaf79e87787e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-6ae6e48ff6631dbf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-044ad214a82bca60.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-d1a5453c5876668d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-c03516e559b9f4a3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-4509cc6dd84574ef.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-ca0017ff3a044f99.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-d9613a992132989e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-783693a4220fff7e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-0a1f1f5191895f32.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-a8c5f332ba2d79dc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-cc6725d904f0269a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-ea5f064801b7fe76.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="article:published_time" content="2020-04-21T13:14:45.000Z">
+<meta property="article:modified_time" content="2020-05-07T03:26:24.738Z">
+<meta property="article:author" content="wizard wu">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/5714046-a489726f6cae09e8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://whytry-gar.github.io/2020/04/21/Android反射和动态代理浅析/"/>
+
+
+
+
+
+  <title>Android反射和动态代理浅析 | wizard。</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">wizard。</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://whytry-gar.github.io/2020/04/21/Android%E5%8F%8D%E5%B0%84%E5%92%8C%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E6%B5%85%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wizard wu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wizard。">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android反射和动态代理浅析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-21T21:14:45+08:00">
+                2020-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <meta name="referrer" content="no-referrer"/>
+
+<h1 id="提纲"><a href="#提纲" class="headerlink" title="提纲"></a>提纲</h1><ul>
+<li>java反射基础</li>
+<li>反射在Android中的应用</li>
+<li>Java动态代理</li>
+<li>动态代理在Android的应用</li>
+</ul>
+<h2 id="java反射基础"><a href="#java反射基础" class="headerlink" title="java反射基础"></a>java反射基础</h2><h3 id="相关定义和简单调用"><a href="#相关定义和简单调用" class="headerlink" title="相关定义和简单调用"></a>相关定义和简单调用</h3><p><img src="https://upload-images.jianshu.io/upload_images/5714046-a489726f6cae09e8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/reflect/package-summary.html" target="_blank" rel="noopener">java反射官方说明链接</a></p>
+<p>Java允许程序在运行时透过Reflection APIs加载一个运行时才得知名称的class，获得其完整结构，包括其modifiers（诸如public, static 等）、superclass（例如Object）、实现之interfaces（例如Cloneable），也包括fields和methods的所有信息，并可于运行时改变fields内容或唤起methods。</p>
+<p>在程序运行时，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意一个方法和属性。这种 动态的获取信息 以及 动态调用对象的方法 的功能称为 java 的反射机制</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-be2720e3b7e993e5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>获取类，类的对象，类具有的成员变量和方法，调用方法，调用构造器创建新类对象，xxx替换为以下方式，可以获得相应目标构造方法，属性</p>
+<p>Constructor：代表类的单个构造方法，通过Constructor我们可执行一个类的某个构造方法（有参或者无参）来创建对象时。     </p>
+<p>Method：代表类中的单个方法，可以用于执行类的某个普通方法，有参或无参，并可以接收返回值。    </p>
+<p>Field：代表类中的单个属性，用于set或get属性 </p>
+<h3 id="Java通过反射访问私有属性"><a href="#Java通过反射访问私有属性" class="headerlink" title="Java通过反射访问私有属性"></a>Java通过反射访问私有属性</h3><p><img src="https://upload-images.jianshu.io/upload_images/5714046-4d3d861462ba3716.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-91109f82af411f5d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>在java中，类的构造方法，方法，属性，都继承于AccessibleObject，AccessibleObject提供了构造方法，普通方法，和属性的访问控制的能力</p>
+<p>setAccessible(booleanflag)方法，将此对象的accessible 标志设置为指示的布尔值。值为true 则指示反射的对象在使用时应该取消Java 语言访问检查。值为false 则指示反射的对象应该实施Java 语言访问检查。</p>
+<p>setAccessible是启用和禁用访问安全检查的开关,并不是为true就能访问为false就不能访问。通过设置setAccessible（true），java可以调用类的私有属性和方法</p>
+<h3 id="Java通过反射修改final修饰的常量值"><a href="#Java通过反射修改final修饰的常量值" class="headerlink" title="Java通过反射修改final修饰的常量值"></a>Java通过反射修改final修饰的常量值</h3><p><img src="https://upload-images.jianshu.io/upload_images/5714046-f502173dcfe4bf3f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>常量是指使用 final 修饰符修饰的成员属性，与变量的区别就在于有无 final 关键字修饰。</p>
+<p>而java中会有个Modifier接口对访问修饰符进行解码</p>
+<p>Java 虚拟机（JVM）在编译 .java 文件得到 .class 文件时，会优化我们的代码以提升效率。其中一个优化就是：<strong>JVM 在编译阶段会把引用常量的代码替换成具体的常量值</strong></p>
+<p>对于 int 、long 、boolean 以及 String 这些基本类型</p>
+<p>JVM 会优化，而对于Integer 、Long 、Boolean 这种包装类型，或者其他诸如Date 、Object 类型则不会被优化。</p>
+<p><strong>总结来说：对于基本类型的静态常量，JVM 在编译阶段会把引用此常量的代码替换成具体的常量值。</strong></p>
+<p>我们在程序运行时刻依然可以使用反射修改常量的值（后面会代码验证），但是JVM 在编译阶段得到的.class 文件已经将常量优化为具体的值，在运行阶段就直接使用具体的值了，所以即使修改了常量的值也已经毫无意义了。</p>
+<p><strong>避免在编译时刻被优化</strong>，这样我们通过反射修改常量之后才有意义，指向一个可变对象，或经过计算（如三目运算符）赋值常量（这些都是运行时进行赋值的，所以有效）</p>
+<h3 id="Java反射效率相比直接调用低"><a href="#Java反射效率相比直接调用低" class="headerlink" title="Java反射效率相比直接调用低"></a>Java反射效率相比直接调用低</h3><p><img src="https://upload-images.jianshu.io/upload_images/5714046-81dd312f525f9f4c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>java反射是要动态的获取实例调用方法，将内存中的对象进行解析，消耗资源去查找和计算，涉及到与底层c语言的交互，反射的过程中有递归和遍历的操作，这些都需要时间</p>
+<h2 id="反射在Android中的应用"><a href="#反射在Android中的应用" class="headerlink" title="反射在Android中的应用"></a>反射在Android中的应用</h2><h3 id="反射在Android源码中的应用"><a href="#反射在Android源码中的应用" class="headerlink" title="反射在Android源码中的应用"></a>反射在Android源码中的应用</h3><p>反射在安卓用的使用相当广泛，源码中也有通过反射创建实例的过程，如Activity的启动过程中Activity的对象的创建</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-4c3ecaf79e87787e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<h3 id="用于调用SDK中-hide标注的隐藏方法"><a href="#用于调用SDK中-hide标注的隐藏方法" class="headerlink" title="用于调用SDK中@hide标注的隐藏方法"></a>用于调用SDK中@hide标注的隐藏方法</h3><p><img src="https://upload-images.jianshu.io/upload_images/5714046-6ae6e48ff6631dbf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<h3 id="Hook源码，添加自己的处理"><a href="#Hook源码，添加自己的处理" class="headerlink" title="Hook源码，添加自己的处理"></a>Hook源码，添加自己的处理</h3><p>通过替换源码中的具体实现类为代理类，添加相关操作，达成部分特殊功能</p>
+<p>Example:监听activity跳转信息，跳转至未在AndroidManifest注册的activity</p>
+<h3 id="反射在部分安卓框架中的应用"><a href="#反射在部分安卓框架中的应用" class="headerlink" title="反射在部分安卓框架中的应用"></a>反射在部分安卓框架中的应用</h3><p><strong>如EventBus 事件总线</strong></p>
+<ul>
+<li>Register：通过反射的方式获取订阅类中有Subscribe注解的方法，将方法信息，参数类，订阅类及实例通过map保存起来</li>
+<li>Post:根据参数类，获取map保存的订阅实例和方法，一一发到分配器</li>
+<li>Dispatch:根据注解Subscribe中的信息，分配至不同的处理器poster。分配至不同线程</li>
+<li>Run：指定线程，调用invokeSubscriber的方法，调用实例的订阅方法，就是反射调用方法invoke。</li>
+</ul>
+<p>也由于EventBus对反射的调用过多，容易导致性能下降问题，EventBus也对此作出了优化</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-044ad214a82bca60.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>编译之后，索引文件在build/generated/source/apt/debug/com/XXX/packge/EventBusIndex.java。</p>
+<p><strong>如Butterknife （反射+annotationProcessor）</strong></p>
+<p>*<em>基于反射和注解解析的IOC框架<br>*</em></p>
+<p>原理：通过annotationProcessor处理注解，反射得到各个需要绑定的成员和类型，生成Target_ViewBinding类，再通过ButterKnife.bind方法绑定实例。</p>
+<p>当然其中还涉及到一个更有趣的技术，编译时注解，后续总结下再分享</p>
+<p>大概原理就是声明的注解的生命周期为CLASS,然后继承AbstractProcessor类。继承这个类后，在编译的时候，编译器会扫描所有带有你要处理的注解的类，然后再调用AbstractProcessor的process方法，对注解进行处理，那么我们就可以在处理的时候，动态生成绑定事件或者控件的java代码，然后在运行的时候，直接调用方法完成绑定</p>
+<p>参考</p>
+<p>ButterKnife解读 <a href="https://www.jianshu.com/p/2967ff971177" target="_blank" rel="noopener">https://www.jianshu.com/p/2967ff971177</a></p>
+<p>ButterKnife源码解析<a href="https://blog.csdn.net/silenceoo/article/details/77897718" target="_blank" rel="noopener">https://blog.csdn.net/silenceoo/article/details/77897718</a></p>
+<h2 id="JDK动态代理"><a href="#JDK动态代理" class="headerlink" title="JDK动态代理"></a>JDK动态代理</h2><h4 id="基础定义"><a href="#基础定义" class="headerlink" title="基础定义"></a>基础定义</h4><ul>
+<li>静态代理：由程序员创建或特定工具自动生成源代码，再对其编译。在程序运行前，代理类的.class文件就已经存在了。</li>
+<li>动态代理：在程序运行时，运用反射机制动态创建而成。</li>
+</ul>
+<p>动态代理类的字节码在程序运行时由Java反射机制动态生成，无需手工编写源代码。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-d1a5453c5876668d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<h4 id="相关的类或接口"><a href="#相关的类或接口" class="headerlink" title="相关的类或接口"></a>相关的类或接口</h4><ul>
+<li>java.lang.reflect.Proxy：这是 Java 动态代理机制的主类，它提供了一组静态方法来为一组接口动态地生成代理类及其对象</li>
+<li><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/reflect/Proxy.html" target="_blank" rel="noopener">https://</a><a href="https://docs.oracle.com/javase/9/docs/api/java/lang/reflect/Proxy.html" target="_blank" rel="noopener">docs.oracle.com/javase/9/docs/api/java/lang/reflect/Proxy.html</a></li>
+<li>java.lang.reflect.InvocationHandler：这是调用处理器接口，它自定义了一个invoke方法，用于几种处理在动态代理类对象上的方法调用。通常在该方法中实现对委托类的代理访问。</li>
+<li>java.lang.ClassLoader：Proxy静态方法生成动态代理类同样需要通过类装载器来进行装载才能使用，它与普通类的唯一区别就是其字节码是由JVM 在运行时动态生成的而非预存在于任何一个.class 文件中。</li>
+</ul>
+<p>三种动态代理的简单demo</p>
+<p><a href="https://github.com/Steven37/three-proxy/blob/48d5d3941f821c90d64a68c00b9a43b6665e5480/src/main/java/jdk/staticproxy/CountProxy.java" target="_blank" rel="noopener">https://github.com/Steven37/three-proxy/blob/48d5d3941f821c90d64a68c00b9a43b6665e5480/src/main/java/jdk/staticproxy/CountProxy.java</a></p>
+<h4 id="动态代理的四个步骤"><a href="#动态代理的四个步骤" class="headerlink" title="动态代理的四个步骤"></a>动态代理的四个步骤</h4><p><img src="https://upload-images.jianshu.io/upload_images/5714046-c03516e559b9f4a3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-4509cc6dd84574ef.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<ul>
+<li>通过实现 InvocationHandler 接口创建自己的调用处理器；</li>
+<li>通过为 Proxy 类指定 ClassLoader 对象和一组 interface 来创建动态代理类</li>
+<li>通过反射机制获得动态代理类的构造函数，其唯一参数类型是调用处理器接口类型</li>
+<li>通过构造函数创建动态代理类实例，构造时调用处理器对象作为参数被传入</li>
+</ul>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-ca0017ff3a044f99.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<h4 id="动态生成的代理类本身的一些特点"><a href="#动态生成的代理类本身的一些特点" class="headerlink" title="动态生成的代理类本身的一些特点"></a>动态生成的代理类本身的一些特点</h4><p>1.包：如果所代理的接口都是public 的，那么它将被定义在顶层包（即包路径为空），如果所代理的接口中有非public 的接口（因为接口不能被定义为protect或private，所以除 public之外就是默认的package访问级别，那么它将被定义在该接口所在包，这样设计的目的是为了最大程度的保证动态代理类不会因为包管理的问题而无法被成功定义并访问；</p>
+<p>2.类修饰符：该代理类具有final 和 public 修饰符，意味着它可以被所有的类访问，但是不能被再度继承；</p>
+<p>3.类名：格式是“$ProxyN”，其中 N 是一个逐一递增的阿拉伯数字，代表Proxy 类第 N 次生成的动态代理类，值得注意的一点是，并不是每次调用Proxy 的静态方法创建动态代理类都会使得N 值增加，原因是如果对同一组接口（包括接口排列的顺序相同）试图重复创建动态代理类，它会很聪明地返回先前已经创建好的代理类的类对象，而不会再尝试去创建一个全新的代理类，这样可以节省不必要的代码重复生成，提高了代理类的创建效率。</p>
+<p>\4. 类继承关系：Proxy 类是它的父类，这个规则适用于所有由</p>
+<p>Proxy 创建的动态代理类。而且该类还实现了其所代理的一组接口;</p>
+<p>但Proxy只能对interface进行代理，无法实现对class的动态代理。</p>
+<h2 id="JDK动态代理的应用"><a href="#JDK动态代理的应用" class="headerlink" title="JDK动态代理的应用"></a>JDK动态代理的应用</h2><h3 id="hook源码，动态代理实现-ServiceHook"><a href="#hook源码，动态代理实现-ServiceHook" class="headerlink" title="hook源码，动态代理实现 ServiceHook"></a>hook源码，动态代理实现 ServiceHook</h3><p><img src="https://upload-images.jianshu.io/upload_images/5714046-d9613a992132989e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>在Android中，Binder是 ServiceManager 连接各种Manager (ActivityManager，WindowManager，等等)和相应 ManagerService 的桥梁；从Android 应用层来说，Binder 是客户端和服务端进行通信的媒介，当</p>
+<p>bindService 的时候，服务端会返回一个包含了服务端业务调用的</p>
+<p>IBinder 对象</p>
+<p>这四者的关系类似于网络访问</p>
+<ul>
+<li>Binder Client 只需要知道自己要使用的 Binder 的名字及其在ServiceManager 中的引用即可获取该Binder 的引用，得到引用后就可以像普通方法调用一样调用Binder 实体的方法;</li>
+<li>Binder Server 在生成一个 IBinder 实体时会为其绑定一个名称并传递给Binder Driver，Binder Driver 会在内核空间中创建相应的Binder 实体节点和节点引用，并将引用传递给ServiceManager。</li>
+<li>ServiceManager 会将该 Binder 的名字和引用插入一张数据表中，这样Binder Client 就能够获取该Binder 实体的引用，并调用上面的方法;ServiceManager 相当于 DNS服务器，负责映射Binder 名称及其引用,其本质同样是一个标准的Binder Server</li>
+<li>Binder Driver 则相当于一个路由器。</li>
+</ul>
+<p>先通过 ServiceManager.getService 方法获取一个IBinder 对象，但是这个IBinder 对象不能直接调用，必须要通过asInterface 方法转成对应的IInterface 对象才可以使用，如果在同一个进程中（当然，这是跨进程通信，这种情况很少），就会直接返回通过attachInterface 方法设置的IInterface 对象（上面代码所述），但是如果不是在同一个进程中，就会先通过IBinder 对象创建一个Proxy 对象，然后在Proxy 对象中通过调用IBinder 对象的 transact 方法调用到主进程的Service 中，实现了跨进程的通信。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-783693a4220fff7e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>常见的，我们可以通过动态代理替换的方式，对android的复制操作的文本，先理解ClipBoardManager的逻辑如上图。</p>
+<p>应用在使用剪切板服务，通过getSyetemService方法获取到的对象就是ClipboardManager,但是内容是先通过ServiceManager获取到ClipBoardManager的远程Ibinder对象， 然后通过Iclipboard$Stub方法将binder转化为本地对象，就是iClipboard$proxy对象</p>
+<p>接下来开始我们的替换操作，具体流程如下</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-0a1f1f5191895f32.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>由于我们动态代理的是本地进程ServiceManager缓存中的Ibinder对象，应用进程的 ServiceManager 其实也就相当于一个 Binder Client，sCache 里面获取不到对应的 Service，它就会自动通过 Binder Driver 和 Binder Server （主进程的 ServiceManager）通信去获取对应的 Service，所以修改 Binder Client，其实是不会影响 Binder Server的操作，所以不会影响别的应用app。</p>
+<h3 id="JDK动态代理在框架中的应用"><a href="#JDK动态代理在框架中的应用" class="headerlink" title="JDK动态代理在框架中的应用"></a>JDK动态代理在框架中的应用</h3><h4 id="完成插件化逻辑（360Android-插件项目-DroidPlugin）"><a href="#完成插件化逻辑（360Android-插件项目-DroidPlugin）" class="headerlink" title="完成插件化逻辑（360Android 插件项目 DroidPlugin）"></a>完成插件化逻辑（360Android 插件项目 DroidPlugin）</h4><p><a href="https://github.com/Qihoo360/DroidPlugin" target="_blank" rel="noopener">https://github.com/Qihoo360/DroidPlugin</a></p>
+<p>360完成的框架DroidPlugin就是基于动态代理hook android系统service的原理</p>
+<p>进行了深度的hook，ams，pms，service，brocastReceiver等</p>
+<p>例如 Hook掉ActivityManagerNative对于startActivity方法的调用，将真的intent藏起来</p>
+<p>Hook掉ActivityThread的handler，修改handleLaunchActivity</p>
+<p>DroidPlugin开源插件研究资料整理 <a href="https://blog.csdn.net/hmmhhmmhmhhm/article/details/74352139" target="_blank" rel="noopener">https://blog.csdn.net/hmmhhmmhmhhm/article/details/74352139</a></p>
+<h4 id="Retrofit网络加载框架"><a href="#Retrofit网络加载框架" class="headerlink" title="Retrofit网络加载框架"></a>Retrofit网络加载框架</h4><p>Retrofit流程如图</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-a8c5f332ba2d79dc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>Retrofit的实现实际就是动态代理的方式</p>
+<p>Retrofit create(finalClass<T> service) 动态代理</p>
+<p>Retrofit loadServiceMethod 加载方法统一处理，将retrofit上的注解修改为request的内容</p>
+<p>ServiceMethod toCall 完成从ServiceMethod到call的转化转化</p>
+<p>createCallAdapter 根据返回类型和注解返回对应adapter</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-cc6725d904f0269a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>简单看看源码，可以很清晰的看到，这是动态代理的实现，当然Retrofit确实是很优秀的框架，不只是动态代理的使用，其中涉及很多良好的设计模式。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-ea5f064801b7fe76.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.jianshu.com/p/0102af578875" target="_blank" rel="noopener">Retrofit2源码分析</a></p>
+<p><a href="https://www.jianshu.com/p/855fce462242" target="_blank" rel="noopener">Retrofit解析9之流程解析</a></p>
+<p>反射详解 <a href="https://juejin.im/post/598ea9116fb9a03c335a99a4" target="_blank" rel="noopener">https://juejin.im/post/598ea9116fb9a03c335a99a4</a></p>
+<p>EventBus 3.0 最佳实践和原理浅析 <a href="https://xiazdong.github.io/2017/08/02/eventbus3/" target="_blank" rel="noopener">https://xiazdong.github.io/2017/08/02/eventbus3/</a></p>
+<p>ProxyGenerator 真正生成字节码的实现类 <a href="http://www.docjar.com/html/api/sun/misc/ProxyGenerator.java.html" target="_blank" rel="noopener">http://www.docjar.com/html/api/sun/misc/ProxyGenerator.java.html</a></p>
+<p>方法说明及解析 <a href="https://www.cnblogs.com/liuyun1995/p/8144706.html" target="_blank" rel="noopener">https://www.cnblogs.com/liuyun1995/p/8144706.html</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    wizard wu
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://whytry-gar.github.io/2020/04/21/Android%E5%8F%8D%E5%B0%84%E5%92%8C%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E6%B5%85%E6%9E%90/" title="Android反射和动态代理浅析">https://whytry-gar.github.io/2020/04/21/Android%E5%8F%8D%E5%B0%84%E5%92%8C%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E6%B5%85%E6%9E%90/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/16/Android%C2%80%E6%B8%A0%E9%81%93%E6%89%93%E5%8C%85%E8%BF%AD%E4%BB%A3%E6%B5%85%E6%9E%90/" rel="next" title="Android渠道打包迭代浅析">
+                <i class="fa fa-chevron-left"></i> Android渠道打包迭代浅析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.jpg"
+                alt="wizard wu" />
+            
+              <p class="site-author-name" itemprop="name">wizard wu</p>
+              <p class="site-description motion-element" itemprop="description">日夜兼程，为了看更多更好的风景</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/whytry-GAR" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#提纲"><span class="nav-number">1.</span> <span class="nav-text">提纲</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#java反射基础"><span class="nav-number">1.1.</span> <span class="nav-text">java反射基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#相关定义和简单调用"><span class="nav-number">1.1.1.</span> <span class="nav-text">相关定义和简单调用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java通过反射访问私有属性"><span class="nav-number">1.1.2.</span> <span class="nav-text">Java通过反射访问私有属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java通过反射修改final修饰的常量值"><span class="nav-number">1.1.3.</span> <span class="nav-text">Java通过反射修改final修饰的常量值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java反射效率相比直接调用低"><span class="nav-number">1.1.4.</span> <span class="nav-text">Java反射效率相比直接调用低</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反射在Android中的应用"><span class="nav-number">1.2.</span> <span class="nav-text">反射在Android中的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#反射在Android源码中的应用"><span class="nav-number">1.2.1.</span> <span class="nav-text">反射在Android源码中的应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用于调用SDK中-hide标注的隐藏方法"><span class="nav-number">1.2.2.</span> <span class="nav-text">用于调用SDK中@hide标注的隐藏方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hook源码，添加自己的处理"><span class="nav-number">1.2.3.</span> <span class="nav-text">Hook源码，添加自己的处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反射在部分安卓框架中的应用"><span class="nav-number">1.2.4.</span> <span class="nav-text">反射在部分安卓框架中的应用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JDK动态代理"><span class="nav-number">1.3.</span> <span class="nav-text">JDK动态代理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基础定义"><span class="nav-number">1.3.0.1.</span> <span class="nav-text">基础定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#相关的类或接口"><span class="nav-number">1.3.0.2.</span> <span class="nav-text">相关的类或接口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#动态代理的四个步骤"><span class="nav-number">1.3.0.3.</span> <span class="nav-text">动态代理的四个步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#动态生成的代理类本身的一些特点"><span class="nav-number">1.3.0.4.</span> <span class="nav-text">动态生成的代理类本身的一些特点</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JDK动态代理的应用"><span class="nav-number">1.4.</span> <span class="nav-text">JDK动态代理的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#hook源码，动态代理实现-ServiceHook"><span class="nav-number">1.4.1.</span> <span class="nav-text">hook源码，动态代理实现 ServiceHook</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JDK动态代理在框架中的应用"><span class="nav-number">1.4.2.</span> <span class="nav-text">JDK动态代理在框架中的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#完成插件化逻辑（360Android-插件项目-DroidPlugin）"><span class="nav-number">1.4.2.1.</span> <span class="nav-text">完成插件化逻辑（360Android 插件项目 DroidPlugin）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Retrofit网络加载框架"><span class="nav-number">1.4.2.2.</span> <span class="nav-text">Retrofit网络加载框架</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wizard wu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
