@@ -348,7 +348,7 @@
 
 <h1 id="提纲"><a href="#提纲" class="headerlink" title="提纲"></a>提纲</h1><p><strong>渠道打包方案：</strong>v1下的渠道包方案迭代，v2渠道包，常见工具库</p>
 <p><strong>原理深入：</strong>部分源码</p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要进行渠道打包，重点是设置渠道标识，而设置渠道标识，涉及apk打包和签名，可以先阅读<a href="https://whytry-gar.github.io/2020/04/14/Android%20%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6%E5%8F%8A%E8%BF%AD%E4%BB%A3%E6%B5%85%E6%9E%90/#more" target="_blank" rel="noopener">《Android 签名机制及迭代浅析》</a>，了解相关知识再阅读本文。</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要进行渠道打包，重点是设置渠道标识，而设置渠道标识，涉及apk打包和签名，可以先阅读<a href="https://whytry-gar.github.io/2020/04/14/Android%20%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6%E5%8F%8A%E8%BF%AD%E4%BB%A3%E6%B5%85%E6%9E%90/#more">《Android 签名机制及迭代浅析》</a>，了解相关知识再阅读本文。</p>
 <p>本文主要一个个说明渠道包打包的不同做法优劣和迭代，如果想要直接获得比较好的渠道打包方式，可以直接看文章后半部分</p>
 <h2 id="V1签名机制下打渠道包"><a href="#V1签名机制下打渠道包" class="headerlink" title="V1签名机制下打渠道包"></a>V1签名机制下打渠道包</h2><p>由V1签名和校验机制可知，修改APK中的任何文件都会导致安装失败！那怎么添加渠道信息呢？</p>
 <h3 id="方案1：Android-Gradle-Plugin"><a href="#方案1：Android-Gradle-Plugin" class="headerlink" title="方案1：Android Gradle Plugin"></a>方案1：Android Gradle Plugin</h3><p><strong>原理：</strong>Gradle Plugin本身提供了多渠道的打包策略，Gradle编译生成多渠道包时，会用不同的渠道信息替换AndroidManifest.xml中的占位符。</p>
