@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="提纲初步了解：是什么，为什么需要，有什么好处，怎么加密和验证，怎么使用，要点补充 签名方案：v1,v2,v3签名及校验流程，版本缺陷 初步了解Android签名机制Android应用程序的签名（是什么）​     - 在Android 系统中，所有安装到系统的应用程序都必有一个数字证书，要求每一个安装进系统的应用程序都是经过数字证书签名的，此数字证书用于标识应用程序的作者和在应用程序之间建立信">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 签名机制及迭代浅析">
+<meta property="og:url" content="http://yoursite.com/2020/04/14/Android%20%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6%E5%8F%8A%E8%BF%AD%E4%BB%A3%E6%B5%85%E6%9E%90/index.html">
+<meta property="og:site_name" content="wizard。">
+<meta property="og:description" content="提纲初步了解：是什么，为什么需要，有什么好处，怎么加密和验证，怎么使用，要点补充 签名方案：v1,v2,v3签名及校验流程，版本缺陷 初步了解Android签名机制Android应用程序的签名（是什么）​     - 在Android 系统中，所有安装到系统的应用程序都必有一个数字证书，要求每一个安装进系统的应用程序都是经过数字证书签名的，此数字证书用于标识应用程序的作者和在应用程序之间建立信">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-9724f02cb3bc9e25.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-f719a288b8215f5f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-53f5082beb60948b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-d3c0f3f98a45af22.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-5494251bf97459b2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-61377723ea8a2cb2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-c13d182efac36cc5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-f50f4ed1c205226d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-7e2de469609022d4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-db2cfa81d47178de.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-bab4e5d6e99fb867.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-8af3409c74537e4c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-84c0660babb9e0e2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-17602791de2ef5b5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-7e17887fb5c783d3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-510338ebb3544c7c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-1ef3535758b994c0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-d0135232252cdfe1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-e27e20c0d42cdbfd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-ae41069523c9d0d9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-a890c2c5122279d1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-d66e2ce0ac116348.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-71ef46ed5c53aa37.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-c741f6efa5a146e3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="article:published_time" content="2020-04-14T14:35:52.000Z">
+<meta property="article:modified_time" content="2020-04-17T09:27:48.907Z">
+<meta property="article:author" content="wizard wu">
+<meta property="article:tag" content="Android">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/5714046-9724f02cb3bc9e25.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/04/14/Android 签名机制及迭代浅析/"/>
+
+
+
+
+
+  <title>Android 签名机制及迭代浅析 | wizard。</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">wizard。</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/14/Android%20%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6%E5%8F%8A%E8%BF%AD%E4%BB%A3%E6%B5%85%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wizard wu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wizard。">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android 签名机制及迭代浅析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-14T22:35:52+08:00">
+                2020-04-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <meta name="referrer" content="no-referrer"/>
+
+<h1 id="提纲"><a href="#提纲" class="headerlink" title="提纲"></a>提纲</h1><p><strong>初步了解</strong>：是什么，为什么需要，有什么好处，怎么加密和验证，怎么使用，要点补充</p>
+<p><strong>签名方案：</strong>v1,v2,v3签名及校验流程，版本缺陷</p>
+<h2 id="初步了解Android签名机制"><a href="#初步了解Android签名机制" class="headerlink" title="初步了解Android签名机制"></a>初步了解Android签名机制</h2><h3 id="Android应用程序的签名（是什么）"><a href="#Android应用程序的签名（是什么）" class="headerlink" title="Android应用程序的签名（是什么）"></a>Android应用程序的签名（是什么）</h3><p>​     - 在Android 系统中，所有安装到系统的应用程序都必有一个数字证书，要求每一个安装进系统的应用程序都是经过数字证书签名的，此数字证书用于标识应用程序的作者和在应用程序之间建立信任关系</p>
+<h3 id="签名的必要性（为什么需要）"><a href="#签名的必要性（为什么需要）" class="headerlink" title="签名的必要性（为什么需要）"></a>签名的必要性（为什么需要）</h3><p>   -<strong>证明 APK的所有者。</strong>通过对 Apk 进行签名，开发者可以证明对 Apk 的所有权和控制权，可用于安装和更新其应用。而在 Android 设备上的安装 Apk ，如果是一个没有被签名的 Apk，则会被拒绝安装。</p>
+<p>   -<strong>允许 Android市场和设备校验APK的正确性。</strong>在安装 Apk 的时候，软件包管理器也会验证 Apk 是否已经被正确签名，并且通过签名证书和数据摘要验证是否合法没有被篡改。只有确认安全无篡改的情况下，才允许安装在设备上。</p>
+<h3 id="统一签名的好处（有什么好处）"><a href="#统一签名的好处（有什么好处）" class="headerlink" title="统一签名的好处（有什么好处）"></a>统一签名的好处（有什么好处）</h3><p>   - <strong>有利于程序升级。</strong>当新版程序和旧版程序的数字证书相同时，Android 系统才会认为这两个程序是同一个程序的不同版本。如果新版程序和旧版程序的数字证书不相同，则Android 系统认为他们是不同的程序，并产生冲突，会要求新程序更改包名。</p>
+<p>   -<strong>有利于程序的模块化设计和开发。</strong>Android 系统允许拥有同一个数字签名的程序运行在一个进程中，Android程序会将他们视为同一个程序。所以开发者可以将自己的程序分模块开发，而用户只需要在需要的时候下载适当的模块</p>
+<p>   -<strong>可以通过权限(permission)的方式在多个程序间共享数据和代码。</strong>Android提供了基于数字证书的权限赋予机制，应用程序可以和其他的程序共享概功能或者数据给那那些与自己拥有相同数字证书的程序。如果某个权限(permission)的protectionLevel是signature，则这个权限就只能授予那些跟该权限所在的包拥有同一个数字证书的程序。</p>
+<h3 id="签名的验证方式（怎么加密和验证的）"><a href="#签名的验证方式（怎么加密和验证的）" class="headerlink" title="签名的验证方式（怎么加密和验证的）"></a>签名的验证方式（怎么加密和验证的）</h3><p>​     发送者把文件用算法生成摘要，再用私钥对摘要进行加密，把证书、文件、加密串、公钥发给接收端。接收端获取到之后，根据证书认真发送者身份，用公钥对加密串进行解密，再对文件也用算法生成摘要，对比解密之后的信息和摘要的信息是否相同。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-9724f02cb3bc9e25.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>签名的认证方式</p>
+<p>签名的动作是执行在打包流程的后期</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-f719a288b8215f5f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>静态资源整理-&gt;编译源码，处理得到dex文件-&gt;合成APK-&gt;签名，对齐</p>
+<h3 id="对Android应用程序签名（怎么使用的）"><a href="#对Android应用程序签名（怎么使用的）" class="headerlink" title="对Android应用程序签名（怎么使用的）"></a>对Android应用程序签名（怎么使用的）</h3><p>使用方面只需要两步</p>
+<p>第一步是生成密钥，在as中就有方便的页面生成密钥</p>
+<p>第二步则是使用密钥签名，常见的在gradle中设置好signingconfig，不同编译下的使用</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-53f5082beb60948b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>生成密钥</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-d3c0f3f98a45af22.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>使用密钥</p>
+<p>这里举例的使用方式是比较常用有效的，也有命令行，gui界面的方式进行设置。在ppt注释中有链接，有兴趣可以看看这些连接</p>
+<p>Android APK命令行实现V1、V2签名及验证<a href="https://www.jianshu.com/p/e00f9bb12340" target="_blank" rel="noopener">https://www.jianshu.com/p/e00f9bb12340</a></p>
+<p>Android 开发者-&gt;Android Studio-&gt;用户指南-&gt;为您的应用签名<a href="https://developer.android.com/studio/publish/app-signing" target="_blank" rel="noopener">https://developer.android.com/studio/publish/app-signing</a></p>
+<h3 id="关于数字证书的要点补充"><a href="#关于数字证书的要点补充" class="headerlink" title="关于数字证书的要点补充"></a>关于数字证书的要点补充</h3><p>​    <strong>-所有的应用程序都必须有数字证书（包括未发布的应用）</strong>。Android 系统不会安装一个没有数字证书的应用程序。</p>
+<p>​     从IDE 中运行或调试您的项目时，Android Studio 将自动使用通过 Android SDK 工具生成的调试证书为您的应用签名。当您首次在 Android Studio 中运行或调试项目时，IDE 会自动在 <code>$HOME/.android/debug.keystore</code> 中创建调试密钥库和证书，并设置密钥库和密钥密码。</p>
+<p>​    <strong>-在签名时，需要考虑数字证书的有效期。</strong>数字证书都是有有效期的，Android 只是在应用程序安装的时候才会检查证书的有效期。如果程序已经安装在系统中，即使证书过期也不会影响程序的正常功能。一旦数字证书失效，持有改数字证书的程序将不能正常升级。</p>
+<h2 id="Android中的签名方案"><a href="#Android中的签名方案" class="headerlink" title="Android中的签名方案"></a>Android中的签名方案</h2><p>Android 的签名方案，发展到现在，不是一蹴而就的。Android</p>
+<p>现在已经有三种应用签名方案，v1升级到v3</p>
+<p>v1 到 v2 是颠覆性的，为了解决JAR签名方案的安全性问题，而到了v3方案，其实结构上并没有太大的调整，可以理解为v2签名方案的升级版，有一些资料也把它称之为v2+方案。</p>
+<p>签名方案的升级，就是向下兼容的，所以只要使用得当，这个过程对开发者是透明的。</p>
+<p>v1 到 v2 方案的升级，对开发者影响最大的，就是渠道打包签署的问题。这个后续会说到。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-5494251bf97459b2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>签名工具有两个jarsigner 和 apksigner。它们的签名算法没什么区别，主要是签名使用的文件不同。</p>
+<p>V1(&lt;7.0)基于jar签名，jarsigner</p>
+<p>V2（&gt;=7.0）基于apk签名，apksigner</p>
+<p>V3(&gt;=9.0)基于apk签名，apksigner，支持密钥轮转</p>
+<p>Android提供了两种对Apk的签名方式，区别：</p>
+<p>1、jarsigner是为jar签名设计的，apksigner是为apk设计的；</p>
+<p>2、jarsigner不能生成v2签名，apksigner可以；</p>
+<p>3、jarsigner没有判断4.2（api17）以下，不能用SHA-256摘要算法；</p>
+<p>4、支持的算法jarsigner使用keystore文件进行签名；</p>
+<p>apksigner除了支持使用keystore文件进行签名外，还支持直接指定pem证书文件和私钥进行签名。</p>
+<p>5、与对齐的关系；</p>
+<h3 id="了解V1签名"><a href="#了解V1签名" class="headerlink" title="了解V1签名"></a>了解V1签名</h3><p><img src="https://upload-images.jianshu.io/upload_images/5714046-61377723ea8a2cb2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>反编译文件图</p>
+<p>通过解压工具打开apk文件，会发现有一个META-INF目录，该目录中有3个文件，这3个文件是签名以后生成的，显然与签名相关，我们依次看这几个文件中的内容：<strong>MANIFEST.MF、CERT.SF和CERT.RSA</strong>。</p>
+<p><strong>MANIFEST.MF：</strong>APK中所有原始文件的数据摘要的Base64编码,而数据摘要算法就是SHA1或者SHA256</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-c13d182efac36cc5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>MANIFEST.MF</p>
+<p><strong>CERT.SF：</strong></p>
+<p>1》计算这个MANIFEST.MF文件的数据摘要（如SHA1算法），再经过BASE64编码后，记录在CERT.SF主属性块（在文件头上）的“SHA1-Digest-Manifest”属性值值下</p>
+<p>2》逐条计算MANIFEST.MF文件中每一个块的数据摘要，并经过BASE64编码后，记录在CERT.SF中的同名块中，属性的名字是“SHA1-Digest</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-f50f4ed1c205226d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>CERT.SF</p>
+<p><strong>CERT.RSA：</strong>把之前生成的 CERT.SF文件， 用私钥计算出签名, 然后将签名以及包含公钥信息的数字证书一同写入生成CERT.RSA文件，用openssl命令才能查看其内容：openssl pkcs7 -inform DER -in CERT.RSA -noout -print_certs –text</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-7e2de469609022d4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>CERT.RSA</p>
+<h4 id="V1签名的详细流程（具体可参考SignApk-java）"><a href="#V1签名的详细流程（具体可参考SignApk-java）" class="headerlink" title="V1签名的详细流程（具体可参考SignApk.java）"></a>V1签名的详细流程（具体可参考<a href="https://android.googlesource.com/platform/build/+/7e447ed/tools/signapk/SignApk.java" target="_blank" rel="noopener">SignApk.java</a>）</h4><p>生成签名过程</p>
+<p>1.对APK内部所有文件（条目），提取摘要后BASE64生成指纹清单MANIFEST.MF;</p>
+<p>2.对指纹清单提取摘要后BASE64生成CERT.SF;</p>
+<p>3.对CERT.SF用私钥加密并且附加公钥生成CERT.RSA.</p>
+<p>整个签名机制的最终产物就是MANIFEST.MF、CERT.SF、CERT.RSA三个文件</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-db2cfa81d47178de.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>生成签名过程</p>
+<h4 id="V1-安装验证签名流程"><a href="#V1-安装验证签名流程" class="headerlink" title="V1 安装验证签名流程"></a>V1 安装验证签名流程</h4><p>1.校验CERT.SF文件</p>
+<p>计算CERT.SF的摘要，与通过签名者公钥解密得到的摘要进行对比，如果一致进行下一步。</p>
+<p>2.检验MANIFEST.MF文件</p>
+<p>计算MANIFEST.MF文件的摘要，与CERT.SF主属性记录的摘要进行对比。</p>
+<p>3.检验apk中每个文件的完整性</p>
+<p>逐步计算apk中每个文件的摘要。与MANIFEST.MF中的记录进行对比，如果一致，则校验通过。</p>
+<p>如果是升级安装，还需校验证书签名是否与已安装的一致。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-bab4e5d6e99fb867.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>v1校验流程</p>
+<p>在安装APK时，Android系统会校验签名，检查APK是否被篡改。代码流程是：PackageManagerService.java -&gt;</p>
+<p>PackageParser.java，PackageParser类负责V1签名的具体校验。</p>
+<p><strong>V1签名是怎么保证APK文件不被篡改的？</strong></p>
+<p>首先，如果破坏者修改了APK中的任何文件，那么被篡改文件的数据摘要的Base64编码就和MANIFEST.MF文件的记录值不一致，导致校验失败。</p>
+<p> 其次，如果破坏者同时修改了对应文件在MANIFEST.MF文件中的Base64值，那么MANIFEST.MF中对应数据块的Base64值就和CERT.SF文件中的记录值不一致，导致校验失败。</p>
+<p>最后，如果破坏者更进一步，同时修改了对应文件在CERT.SF文件中的Base64值，那么CERT.SF的数字签名就和CERT.RSA记录的签名不一致，也会校验失败。</p>
+<p>那有没有可能继续伪造CERT.SF的数字签名那？理论上不可能，因为破坏者没有开发者的私钥。那破坏者是不是可以用自己的私钥和数字证书重新签名那，这倒是完全可以！</p>
+<p>综上所述，任何对APK文件的修改，在安装时都会失败，除非对APK重新签名。但是相同包名，不同签名的APK也是不能同时安装的。</p>
+<h4 id="V1签名的缺陷（也是迭代V2的原因）"><a href="#V1签名的缺陷（也是迭代V2的原因）" class="headerlink" title="V1签名的缺陷（也是迭代V2的原因）"></a>V1签名的缺陷（也是迭代V2的原因）</h4><p><strong>Ø不够安全，签名验证范围仅验证 元数据 以外的 文件 条目，这里说的元数据主要指meta-inf目录下的文件</strong></p>
+<p>v1 签名方案，并不会保护</p>
+<p>Apk 内的所有内容，有一些例外部分，被修改也并不会导致签名失效</p>
+<p>这样，在验证APK 签名的时候，就需要处理大量不可信（尚未经过验证）的数据结构，然后还需要过滤并舍弃掉这部分不受签名保护的数据，再进行签名校验。也就是说你可以在已签名的文件中，增加一些不被签名保护的内容，这将导致受攻击的可能增大。</p>
+<p>（图为<a href="https://www.androidos.net.cn/android/9.0.0_r8/xref/tools/apksig/src/main/java/com/android/apksig/internal/apk/v1/V1SchemeVerifier.java" target="_blank" rel="noopener">V1SchemeVerifier.java</a>）</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-8af3409c74537e4c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p><strong>Ø不够迅速：验证签名的时候，须解压所有已压缩的文件条目进行数据摘要的校验</strong></p>
+<p><strong>v1</strong>方案是对 APK 内部的被保护的原始文件（未压缩），单独进行计算数据摘要，所以在验证期间，也需要对每个文件进行解压再进行签名校验，来验证是否被篡改。所以在验证APK 签名的时候，必须解压 APK 的所有已压缩的文件条目进行数据摘要的校验，而这些，都将需要花费更多的时间和内存。</p>
+<h3 id="了解V2签名（Android-7-0引入）"><a href="#了解V2签名（Android-7-0引入）" class="headerlink" title="了解V2签名（Android 7.0引入）"></a>了解V2签名（Android 7.0引入）</h3><h4 id="引入目的：解决v1的问题"><a href="#引入目的：解决v1的问题" class="headerlink" title="引入目的：解决v1的问题"></a>引入目的：解决v1的问题</h4><p>ØMANIFEST.MF中的数据摘要是基于原始未压缩文件计算的。因此<strong>在校验时，需要先解压出原始文件，才能进行校验。而解压操作无疑是耗时的。</strong></p>
+<p>ØV1签名仅仅校验APK第一部分中的文件，<strong>缺少对APK的完整性校验。</strong>因此，在签名后，我们还可以修改APK文件，例如：通过zipalign进行字节对齐后，仍然可以正常安装。</p>
+<h4 id="怎么解决的"><a href="#怎么解决的" class="headerlink" title="怎么解决的"></a>怎么解决的</h4><p>ØV2签名是<strong>对APK本身进行数据摘要计算</strong>，不存在解压APK的操作，减少了校验时间。</p>
+<p>ØV2签名是<strong>针对整个APK进行校验</strong>（不包含签名块本身），因此对APK的任何修改（包括添加注释、zipalign字节对齐）都无法通过V2签名的校验。</p>
+<p>某实验室数据（Nexus 6P、Android 7.1.1）可供参考</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-84c0660babb9e0e2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<h4 id="了解APK文件结构（V1）"><a href="#了解APK文件结构（V1）" class="headerlink" title="了解APK文件结构（V1）"></a>了解APK文件结构（V1）</h4><p><img src="https://upload-images.jianshu.io/upload_images/5714046-17602791de2ef5b5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>APK文件本质上是一个ZIP压缩包，而ZIP格式是固定的，主要由三部分构成，如下图所示</p>
+<p>Ø第一部分是内容块，所有的压缩文件都在这部分。每个压缩文件都有一个local file header，主要记录了文件名、压缩算法、压缩前后的文件大小、修改时间、CRC32值等。</p>
+<p>Ø第二部分称为中央目录，包含了多个central directory file header（和第一部分的local file header一一对应），每个中央目录文件头主要记录了压缩算法、注释信息、对应local file header的偏移量等，方便快速定位数据。</p>
+<p>Ø最后一部分是EOCD，主要记录了中央目录大小、偏移量和ZIP注释信息等</p>
+<p>根据之前的V1签名和校验机制可知，V1签名只会检验第一部分的所有压缩文件，而不理会后两部分内容。</p>
+<h4 id="了解APK文件结构（V2区别于V1）"><a href="#了解APK文件结构（V2区别于V1）" class="headerlink" title="了解APK文件结构（V2区别于V1）"></a>了解APK文件结构（V2区别于V1）</h4><p>v2 签名会在原先APK块中增加了一个新的块（签名块），新的块存储了签名、摘要、签名算法、证书链和额外属性等信息，这个块有特定的格式。</p>
+<p>APK签名块位于中央目录之前，文件数据之后。V2签名同时修改了EOCD中的中央目录的偏移量，使签名后的APK还符合ZIP结构。</p>
+<p>v2 签名块负责保护第1、3、4 部分的完整性，以及第2部分包含的APK 签名方案v2分块中的signed data分块的完整性。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-7e17887fb5c783d3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<h4 id="V2签名原理"><a href="#V2签名原理" class="headerlink" title="V2签名原理"></a>V2签名原理</h4><p><img src="https://upload-images.jianshu.io/upload_images/5714046-510338ebb3544c7c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<h4 id="V2签名块的生成（可参考ApkSignerV2）"><a href="#V2签名块的生成（可参考ApkSignerV2）" class="headerlink" title="V2签名块的生成（可参考ApkSignerV2）"></a>V2签名块的生成（可参考<a href="https://link.jianshu.com/?t=https://android.googlesource.com/platform/build/+/dd910c5/tools/signapk/src/com/android/signapk/ApkSignerV2.java" target="_blank" rel="noopener">ApkSignerV2</a>）</h4><p><img src="https://upload-images.jianshu.io/upload_images/5714046-1ef3535758b994c0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>V2签名块的生成可参考<a href="https://link.jianshu.com/?t=https://android.googlesource.com/platform/build/+/dd910c5/tools/signapk/src/com/android/signapk/ApkSignerV2.java" target="_blank" rel="noopener">ApkSignerV2</a>，整体结构和流程如图</p>
+<p>首先，根据多个签名算法，计算出整个APK的数据摘要，组成左上角的APK数据摘要集；</p>
+<p>接着，把最左侧一列的数据摘要、数字证书和额外属性组装起来，形成类似于V1签名的“MF”文件（第二列第一行）；</p>
+<p>其次，再用相同的私钥，不同的签名算法，计算出“MF”文件的数字签名，形成类似于V1签名的“SF”文件（第二列第二行）；</p>
+<p>然后，把第二列的类似MF文件、类似SF文件和开发者公钥一起组装成通过单个keystore签名后的v2签名块（第三列第一行）。</p>
+<p>最后，把多个keystore签名后的签名块组装起来，就是完整的V2签名块了（Android中允许使用多个keystore对apk进行签名）。</p>
+<p>简而言之，单个keystore签名块主要由三部分组成，分别是上图中第二列的三个数据块：类似MF文件、类似SF文件和开发者公钥，其结构如图2所示</p>
+<h4 id="V2签名的校验流程（PackageManagerService-java"><a href="#V2签名的校验流程（PackageManagerService-java" class="headerlink" title="V2签名的校验流程（PackageManagerService.java"></a>V2签名的校验流程（PackageManagerService.java</h4><h4 id="gt-PackageParser-java-gt-ApkSignatureSchemeV2Verifier-java）"><a href="#gt-PackageParser-java-gt-ApkSignatureSchemeV2Verifier-java）" class="headerlink" title="-&gt; PackageParser.java -&gt; ApkSignatureSchemeV2Verifier.java）"></a>-&gt; PackageParser.java -&gt; ApkSignatureSchemeV2Verifier.java）</h4><p><img src="https://upload-images.jianshu.io/upload_images/5714046-d0135232252cdfe1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>CERT.SF</p>
+<p>Android Gradle Plugin2.2之上默认会同时开启V1和V2签名，同时包含V1和V2签名的<strong>CERT.SF文件会有一个特殊的主属性</strong>，该属性会强制APK走V2校验流程（7.0之上），以充分利用V2签名的优势（速度快和更完善的校验机制）</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-e27e20c0d42cdbfd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>同时包含V1和V2签名的APK的校验流程，优先校验V2，没有或者不认识V2，则校验V1。具体校验类似v1，但是不是校验一个个文件，而是apk的分段，如下图所示</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-ae41069523c9d0d9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p><strong>V2签名是怎么保证APK不被篡改的？</strong></p>
+<p>首先，如果破坏者修改了APK文件的任何部分（签名块本身除外），那么APK的数据摘要就和“MF”数据块中记录的数据摘要不一致，导致校验失败。</p>
+<p>其次，如果破坏者同时修改了“MF”数据块中的数据摘要，那么“MF”数据块的数字签名就和“SF”数据块中记录的数字签名不一致，导致校验失败。</p>
+<p>然后，如果破坏者使用自己的私钥去加密生成“SF”数据块，那么使用开发者的公钥去解密“SF”数据块中的数字签名就会失败；</p>
+<p>最后，更进一步，若破坏者甚至替换了开发者公钥，那么使用数字证书中的公钥校验签名块中的公钥就会失败，这也正是数字证书的作用。</p>
+<p>综上所述，任何对APK的修改，在安装时都会失败，除非对APK重新签名。但是相同包名，不同签名的APK也是不能同时安装的。</p>
+<h4 id="V2签名注意点补充"><a href="#V2签名注意点补充" class="headerlink" title="V2签名注意点补充"></a>V2签名注意点补充</h4><p>Q1：V2签名后EOCD的中央目录偏移量更改了，安装时怎么通过校验的？</p>
+<p>A1：Android系统在校验APK的数据摘要时，首先会把EOCD的中央目录偏移量替换成签名块的偏移量，然后再计算数据摘要。而签名块的偏移量就是v2签名之前的中央目录偏移量</p>
+<p>具体代码逻辑，可参考<a href="https://link.jianshu.com/?t=http://link.zhihu.com/?target=https://android.googlesource.com/platform/frameworks/base/%2B/master/core/java/android/util/apk/ApkSignatureSchemeV2Verifier.java">ApkSignatureSchemeV2Verifier.java</a>。截图自<a href="https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/util/apk/ApkSigningBlockUtils.java" target="_blank" rel="noopener">https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/util/apk/ApkSigningBlockUtils.java</a></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-a890c2c5122279d1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>代码截自ApkSigningBlockUtils.java</p>
+<p>Q2：APK先V1签名，还是V2先签名？</p>
+<p>A2：先V1，再V2，因为JAR签名需要修改zip数据区和中央目录的内容，先使用V2签名再JAR签名会破坏V2签名的完整性。</p>
+<p>Q3：删掉V2签名，能否绕过V2签名？</p>
+<p>A3：不行，签名CERT.SF文件中的标志也是防回滚的保护，防止删除高版本签名，仅验证低版本签名</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-d66e2ce0ac116348.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>Q4：APK签名时，只有V2签名，没有V1签名行不行？</p>
+<p>A4：这种情况是可以编译通过的，并且在Android 7.0之上也可以正确安装和运行。但是7.0之下，因为不认识V2，又没有V1签名，所以会报没有签名的错误。</p>
+<h4 id="V2签名的缺陷：没支持签名的更新（迭代v3原因）"><a href="#V2签名的缺陷：没支持签名的更新（迭代v3原因）" class="headerlink" title="V2签名的缺陷：没支持签名的更新（迭代v3原因）"></a>V2签名的缺陷：没支持签名的更新（迭代v3原因）</h4><p>Ø签名有默认25年的有效期限</p>
+<p>Ø签名泄漏想替换</p>
+<h3 id="了解V3签名（Android-9-0-引入）"><a href="#了解V3签名（Android-9-0-引入）" class="headerlink" title="了解V3签名（Android 9.0 引入）"></a>了解V3签名（Android 9.0 引入）</h3><p><img src="https://upload-images.jianshu.io/upload_images/5714046-71ef46ed5c53aa37.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>V3签名结构基于V2， 增加支持<strong>密钥轮转</strong></p>
+<p>V3 签名<strong>新增的新块（attr）存储了所有的签名信息，由更小的 Level 块，以链表的形式存储</strong>。</p>
+<p>其中每个节点都包含用于为之前版本的应用签名的签名证书，最旧的签名证书对应根节点，系统会让每个节点中的证书为列表中下一个证书签名，从而为每个新密钥提供证据来证明它应该像旧密钥一样可信。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-c741f6efa5a146e3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>V3 方案还没有正式开放，在最新版的Build Tools 版本28.0.3中的Apksigner，尚不支持V3的APK签名方案。想尝鲜可以通过源代码自行编译。</p>
+<p><a href="https://developer.android.google.cn/studio/command-line/apksigner" target="_blank" rel="noopener">https://developer.android.google.cn/studio/command-line/apksigner#usage-verify</a></p>
+<p>到这里，就了解完了签名的机制，下一篇讲下android的打包机制。感谢支持</p>
+<h3 id="参考文档："><a href="#参考文档：" class="headerlink" title="参考文档："></a>参考文档：</h3><p>•<strong>应用签名</strong> <a href="https://source.android.google.cn/security/apksigning" target="_blank" rel="noopener">https://source.android.google.cn/security/apksigning</a></p>
+<p>•<strong>Android 签名机制 v1、v2、v3</strong> <a href="https://www.jianshu.com/p/9ca1d6f3f083" target="_blank" rel="noopener">https://www.jianshu.com/p/9ca1d6f3f083</a></p>
+<p>•<strong>APK签名机制原理详解</strong> <a href="https://www.jianshu.com/p/286d2b372334" target="_blank" rel="noopener">https://www.jianshu.com/p/286d2b372334</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    wizard wu
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://yoursite.com/2020/04/14/Android%20%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6%E5%8F%8A%E8%BF%AD%E4%BB%A3%E6%B5%85%E6%9E%90/" title="Android 签名机制及迭代浅析">http://yoursite.com/2020/04/14/Android%20%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6%E5%8F%8A%E8%BF%AD%E4%BB%A3%E6%B5%85%E6%9E%90/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/18/Android%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E8%B7%B5/" rel="next" title="Android线程池的原理及实践">
+                <i class="fa fa-chevron-left"></i> Android线程池的原理及实践
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/16/Android%C2%80%E6%B8%A0%E9%81%93%E6%89%93%E5%8C%85%E8%BF%AD%E4%BB%A3%E6%B5%85%E6%9E%90/" rel="prev" title="Android渠道打包迭代浅析">
+                Android渠道打包迭代浅析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.jpg"
+                alt="wizard wu" />
+            
+              <p class="site-author-name" itemprop="name">wizard wu</p>
+              <p class="site-description motion-element" itemprop="description">日夜兼程，为了看更多更好的风景</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/whytry-GAR" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#提纲"><span class="nav-number">1.</span> <span class="nav-text">提纲</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#初步了解Android签名机制"><span class="nav-number">1.1.</span> <span class="nav-text">初步了解Android签名机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Android应用程序的签名（是什么）"><span class="nav-number">1.1.1.</span> <span class="nav-text">Android应用程序的签名（是什么）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#签名的必要性（为什么需要）"><span class="nav-number">1.1.2.</span> <span class="nav-text">签名的必要性（为什么需要）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#统一签名的好处（有什么好处）"><span class="nav-number">1.1.3.</span> <span class="nav-text">统一签名的好处（有什么好处）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#签名的验证方式（怎么加密和验证的）"><span class="nav-number">1.1.4.</span> <span class="nav-text">签名的验证方式（怎么加密和验证的）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对Android应用程序签名（怎么使用的）"><span class="nav-number">1.1.5.</span> <span class="nav-text">对Android应用程序签名（怎么使用的）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关于数字证书的要点补充"><span class="nav-number">1.1.6.</span> <span class="nav-text">关于数字证书的要点补充</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Android中的签名方案"><span class="nav-number">1.2.</span> <span class="nav-text">Android中的签名方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#了解V1签名"><span class="nav-number">1.2.1.</span> <span class="nav-text">了解V1签名</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#V1签名的详细流程（具体可参考SignApk-java）"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">V1签名的详细流程（具体可参考SignApk.java）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#V1-安装验证签名流程"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">V1 安装验证签名流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#V1签名的缺陷（也是迭代V2的原因）"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">V1签名的缺陷（也是迭代V2的原因）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#了解V2签名（Android-7-0引入）"><span class="nav-number">1.2.2.</span> <span class="nav-text">了解V2签名（Android 7.0引入）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#引入目的：解决v1的问题"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">引入目的：解决v1的问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#怎么解决的"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">怎么解决的</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#了解APK文件结构（V1）"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">了解APK文件结构（V1）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#了解APK文件结构（V2区别于V1）"><span class="nav-number">1.2.2.4.</span> <span class="nav-text">了解APK文件结构（V2区别于V1）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#V2签名原理"><span class="nav-number">1.2.2.5.</span> <span class="nav-text">V2签名原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#V2签名块的生成（可参考ApkSignerV2）"><span class="nav-number">1.2.2.6.</span> <span class="nav-text">V2签名块的生成（可参考ApkSignerV2）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#V2签名的校验流程（PackageManagerService-java"><span class="nav-number">1.2.2.7.</span> <span class="nav-text">V2签名的校验流程（PackageManagerService.java</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#gt-PackageParser-java-gt-ApkSignatureSchemeV2Verifier-java）"><span class="nav-number">1.2.2.8.</span> <span class="nav-text">-&gt; PackageParser.java -&gt; ApkSignatureSchemeV2Verifier.java）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#V2签名注意点补充"><span class="nav-number">1.2.2.9.</span> <span class="nav-text">V2签名注意点补充</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#V2签名的缺陷：没支持签名的更新（迭代v3原因）"><span class="nav-number">1.2.2.10.</span> <span class="nav-text">V2签名的缺陷：没支持签名的更新（迭代v3原因）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#了解V3签名（Android-9-0-引入）"><span class="nav-number">1.2.3.</span> <span class="nav-text">了解V3签名（Android 9.0 引入）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文档："><span class="nav-number">1.2.4.</span> <span class="nav-text">参考文档：</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wizard wu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
