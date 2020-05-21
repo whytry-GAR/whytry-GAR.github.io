@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言在手机的更多设置或者高级设置中，我们会发现有个无障碍的功能，很多人不知道这个功能具体是干嘛的，包括我们开发也很少接触这部分功能，以至于对这块不甚了解。前段时间在汉光的安利下去了解了下这部分功能。在这里和大家浅谈下自己对这个功能的理解和部分运用。这边打算从 “是什么，为什么，怎么用，好不好”几个方面来说 提纲是什么（应用场景，定义，作用） 为什么（原理及源码解析） 怎么用（如何开发无障碍服务）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="详解安卓辅助功能服务（无障碍服务，微信抢红包助手原理）">
+<meta property="og:url" content="https://whytry-gar.github.io/2020/05/21/%E8%AF%A6%E8%A7%A3%E5%AE%89%E5%8D%93%E8%BE%85%E5%8A%A9%E5%8A%9F%E8%83%BD%E6%9C%8D%E5%8A%A1%EF%BC%88%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1%EF%BC%8C%E5%BE%AE%E4%BF%A1%E6%8A%A2%E7%BA%A2%E5%8C%85%E5%8A%A9%E6%89%8B%E5%8E%9F%E7%90%86%EF%BC%89/index.html">
+<meta property="og:site_name" content="wizard。">
+<meta property="og:description" content="前言在手机的更多设置或者高级设置中，我们会发现有个无障碍的功能，很多人不知道这个功能具体是干嘛的，包括我们开发也很少接触这部分功能，以至于对这块不甚了解。前段时间在汉光的安利下去了解了下这部分功能。在这里和大家浅谈下自己对这个功能的理解和部分运用。这边打算从 “是什么，为什么，怎么用，好不好”几个方面来说 提纲是什么（应用场景，定义，作用） 为什么（原理及源码解析） 怎么用（如何开发无障碍服务）">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-67b42e781d3f1e8f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-da08f8e0c23d7365.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-7cf34ceee1ad67cf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-68a84a9217903800.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-a24a6a543f28d46c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-cecbb43dd2b74bf8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-344ab296134884d3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-66a3d45196168203.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-bbd7e30f4f08a43c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5714046-d99e1a3e4eb92c2d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="article:published_time" content="2020-05-21T08:52:15.000Z">
+<meta property="article:modified_time" content="2020-05-21T09:02:30.413Z">
+<meta property="article:author" content="wizard wu">
+<meta property="article:tag" content="Android">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/5714046-67b42e781d3f1e8f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://whytry-gar.github.io/2020/05/21/详解安卓辅助功能服务（无障碍服务，微信抢红包助手原理）/"/>
+
+
+
+
+
+  <title>详解安卓辅助功能服务（无障碍服务，微信抢红包助手原理） | wizard。</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">wizard。</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://whytry-gar.github.io/2020/05/21/%E8%AF%A6%E8%A7%A3%E5%AE%89%E5%8D%93%E8%BE%85%E5%8A%A9%E5%8A%9F%E8%83%BD%E6%9C%8D%E5%8A%A1%EF%BC%88%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1%EF%BC%8C%E5%BE%AE%E4%BF%A1%E6%8A%A2%E7%BA%A2%E5%8C%85%E5%8A%A9%E6%89%8B%E5%8E%9F%E7%90%86%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wizard wu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wizard。">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">详解安卓辅助功能服务（无障碍服务，微信抢红包助手原理）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-21T16:52:15+08:00">
+                2020-05-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在手机的更多设置或者高级设置中，我们会发现有个无障碍的功能，很多人不知道这个功能具体是干嘛的，包括我们开发也很少接触这部分功能，以至于对这块不甚了解。前段时间在汉光的安利下去了解了下这部分功能。在这里和大家浅谈下自己对这个功能的理解和部分运用。这边打算从 “是什么，为什么，怎么用，好不好”几个方面来说</p>
+<h1 id="提纲"><a href="#提纲" class="headerlink" title="提纲"></a>提纲</h1><p>是什么（应用场景，定义，作用）</p>
+<p>为什么（原理及源码解析）</p>
+<p>怎么用（如何开发无障碍服务）</p>
+<p>怎么防（防止无障碍服务外挂的一些做法）</p>
+<h2 id="是什么（定位及作用）"><a href="#是什么（定位及作用）" class="headerlink" title="是什么（定位及作用）"></a>是什么（定位及作用）</h2><p>为了更好的介绍辅助功能服务，这里先看下应用场景</p>
+<p>辅助功能服务一般用于操作自动化和辅助操作</p>
+<p>•应用场景</p>
+<p>Ø操作自动化，通过辅助功能服务来代替用户执行连续性的操作，重复性的操作，或者特殊场景的操作（例如自动抢红包，自动点赞，自动回复，自动搜索更优惠商品）</p>
+<p><a href="https://github.com/coder-pig/WechatHelper" target="_blank" rel="noopener">WechatHelper</a>  <a href="https://github.com/coder-pig/WechatHelper" target="_blank" rel="noopener">https://github.com/coder-pig/WechatHelper</a></p>
+<p>Ø辅助操作，帮助无法和设备完全交互的用户（例如患有视力问题或正在忙而无法操作手机的用户）执行操作（例如talkback（视力低弱辅助），随选听读，语音操作）</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-67b42e781d3f1e8f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>•官方定义（AccessibilityService）</p>
+<p>无障碍服务是一种应用程序，给有残疾的用户或暂时无法与设备完全交互的用户提供了更好的无障碍用户交互功能。比如驾驶、照顾小孩或者在吵闹的派对上可能需要额外或者替代的交互反馈。</p>
+<p>Android提供标准的辅助功能服务，包括TalkBack，开发人员可以创建和分发自己的服务。</p>
+<p>•引入及发展</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-da08f8e0c23d7365.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>在Android 4.0以前，Accessibility功能单一，仅能过单向获取窗口信息(获取输入框内容)；</p>
+<p>在Android 4.0及以后，Accessibility增加了与窗口元素的双向交互，可以操作窗口元素(点击按钮)。</p>
+<p>在Android 4.0之前，无障碍服务事件在提供有关用户选择的用户界面控件的信息时，只提供了有限的上下文信息。在许多情况下，缺少的上下文信息可能对理解所选控件的含义至关重要。</p>
+<p>Android 4.0通过基于视图层次结构组合可访问性事件，显着扩展了辅助功能服务可以获得的有关用户界面交互的信息量。</p>
+<p>辅助功能服务可以代表用户执行操作，包括更改输入焦点和选择（激活）用户界面元素。在Android</p>
+<p>4.1（API级别16）中，操作范围已扩展为包括滚动列表和与文本字段交互。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-7cf34ceee1ad67cf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>因为无障碍服务具有强大的界面监听能力和替代用户操作的能力，谷歌建议辅助功能服务仅应用于帮助残障用户使用Android设备和应用。</p>
+<p>在我们开发者看来，无障碍服务显然能做的更多，例如微信抢红包应用，自动点赞，自动回复等</p>
+<p>android 辅助功能google官方示例 <a href="https://github.com/googlesamples/android-BasicAccessibility" target="_blank" rel="noopener">https://github.com/googlesamples/android-BasicAccessibility</a></p>
+<h2 id="为什么（原理及源码解析）"><a href="#为什么（原理及源码解析）" class="headerlink" title="为什么（原理及源码解析）"></a>为什么（原理及源码解析）</h2><p>Q:为什么辅助功能可以监听用户的操作，界面变化，并根据需要进行反馈</p>
+<p>A:辅助功能通过在后台中运行无障碍服务，通过AccessibilityEvent接收指定事件的回调，这样的事件表示用户在界面中的一些状态转换，例如：焦点改变了，一个按钮被点击，等等。</p>
+<p>简单的说无障碍就是一个后台监控服务，当你监控的内容发生改变时，就会调用后台服务的回调方法</p>
+<h3 id="从具体实例入手看原理：-程序内部的后台服务——-内部的跨进程通信-AM-amp-AMS"><a href="#从具体实例入手看原理：-程序内部的后台服务——-内部的跨进程通信-AM-amp-AMS" class="headerlink" title="从具体实例入手看原理： 程序内部的后台服务—— 内部的跨进程通信 AM &amp; AMS"></a>从具体实例入手看原理： 程序内部的后台服务—— 内部的跨进程通信 AM &amp; AMS</h3><p>拿一个具体的例子来看，这是一个抢红包的外挂，把WeChat称作Target</p>
+<p>APP，就是被监控的APP，当跳出来一个红包，触发了一个AccessibilityEvent，system_server中的AccessibilityManagerService将AccessibilityEvent分发给有AccessibilityService的APP，称为Accessibility</p>
+<p>APP，这个AccessibilityService受到这个AccessibilityEvent后，会找到这个页面的Open</p>
+<p>Button，模拟点击。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-68a84a9217903800.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>而在程序内部，这个过程其实就是三个类之间的交互 AccessibilityManager（AM）：发送AccessibilityEvent AccessibilityManagerService（AMS）：分发事件 AccessibilityService（AS）：进行回应 </p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-a24a6a543f28d46c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>看到AccessibilityManagerService这样的起名，就很容易联想到，这是一个<strong>Binder通信</strong>的过程，AM通过IAccessibilityManager（AMS的本地Binder）与AMS跨进程通信。AMS通过IAccessibilityManagerClient（AM的本地Binder）与AM通信。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-cecbb43dd2b74bf8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<h3 id="AM是与AMS进行通信"><a href="#AM是与AMS进行通信" class="headerlink" title="AM是与AMS进行通信"></a><strong>AM是与AMS进行通信</strong></h3><p>AM是什么时候与AMS进行通信的，查看源码可以知道，AM的设计其实是一个单例模式，每个app进程都会有一个AM，而AM在构建的时候，即getInstance的时候，就会调用tryConnectToServiceLocked（）的方法，连接AMS，得到AMS的代理后，把自己的代理也设置给AMS，这样AM就可以和AMS进行通信了</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-344ab296134884d3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<h3 id="AS和AMS联系的时机"><a href="#AS和AMS联系的时机" class="headerlink" title="AS和AMS联系的时机"></a>AS和AMS联系的时机</h3><p>那么<strong>AS又是什么时候和AMS有联系的</strong>呢，这又是一个跨进程binder通信的过程。</p>
+<p>无障碍服务是很强大的服务，需要我们进到设置中开启这个服务。绑定Service。</p>
+<p>这里我们结合时序图进行说明。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-66a3d45196168203.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>Settings-&gt;Accessibility-&gt;enable（enableAccessibilityServiceLocked()）</p>
+<p>Settings-&gt;Accessibility-&gt;disable（disableAccessibilityServiceLocked()）</p>
+<p>Some RegisterBroadcastReceivers （registerBroadcastReceivers()）</p>
+<p>当用户在设置-&gt;无障碍里面选择了开启或关闭一个辅助功能，会导致一些系统状态会变化；Accessibility APP的安装状态会以BroadcastReceivers的方式会通知状态改变；还有其他的一些状态改变。这些变化最终会调用到AMS的onUserStateChangedLocked()方法。</p>
+<p>RegisterBroadcastReceivers 很多情况简单列为这四种，安装app，更新app。强制关闭app，删除app。</p>
+<p>onUserStateChangedLocked方法中，有比较多的方法调用，都是一些特定状态的更新，但我们这次只用关注updateServicesLocked这个方法，是处理无障碍服务绑定的</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-bbd7e30f4f08a43c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>updateServicesLocked这个方法涉及到多个AMS类内部的集合，遍历如上图左边所见</p>
+<p>这个方法会遍历ams中的mInstalledServices，看名字可以知道是已经安装的无障碍服务列表。</p>
+<p>然后根据enableServices，判断是否已经启用，如果启用则通过mComponentNameToServiceMap判断是否为空，为空就会new一个AccessibilityServiceConnection， 调用其bindlock方法，绑定</p>
+<p>未启用就通过mComponentNameToServiceMap判断是否为空，不为空就调用其unbindLocked()，解绑</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5714046-d99e1a3e4eb92c2d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img"></p>
+<p>接下来的过程其实就是跨进程的Binder通信。AS会通过onBind(Intent intent)这个函数返回一个IAccessibilityServiceClientWrapper对象给AccessibilityServiceConnection，这个对象就是AS的本地Binder，AccessibilityServiceConnection通过这个本地Binder去和AS通信。</p>
+<p>然后AccessibilityServiceConnection会在onServiceConnected中调用方法，把自己的代理传到AS中。</p>
+<h3 id="监听无障碍服务事件"><a href="#监听无障碍服务事件" class="headerlink" title="监听无障碍服务事件"></a>监听无障碍服务事件</h3>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    wizard wu
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://whytry-gar.github.io/2020/05/21/%E8%AF%A6%E8%A7%A3%E5%AE%89%E5%8D%93%E8%BE%85%E5%8A%A9%E5%8A%9F%E8%83%BD%E6%9C%8D%E5%8A%A1%EF%BC%88%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1%EF%BC%8C%E5%BE%AE%E4%BF%A1%E6%8A%A2%E7%BA%A2%E5%8C%85%E5%8A%A9%E6%89%8B%E5%8E%9F%E7%90%86%EF%BC%89/" title="详解安卓辅助功能服务（无障碍服务，微信抢红包助手原理）">https://whytry-gar.github.io/2020/05/21/%E8%AF%A6%E8%A7%A3%E5%AE%89%E5%8D%93%E8%BE%85%E5%8A%A9%E5%8A%9F%E8%83%BD%E6%9C%8D%E5%8A%A1%EF%BC%88%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1%EF%BC%8C%E5%BE%AE%E4%BF%A1%E6%8A%A2%E7%BA%A2%E5%8C%85%E5%8A%A9%E6%89%8B%E5%8E%9F%E7%90%86%EF%BC%89/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/21/Android%E5%8F%8D%E5%B0%84%E5%92%8C%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E6%B5%85%E6%9E%90/" rel="next" title="Android反射和动态代理浅析">
+                <i class="fa fa-chevron-left"></i> Android反射和动态代理浅析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.jpg"
+                alt="wizard wu" />
+            
+              <p class="site-author-name" itemprop="name">wizard wu</p>
+              <p class="site-description motion-element" itemprop="description">日夜兼程，为了看更多更好的风景</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/whytry-GAR" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#提纲"><span class="nav-number">2.</span> <span class="nav-text">提纲</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#是什么（定位及作用）"><span class="nav-number">2.1.</span> <span class="nav-text">是什么（定位及作用）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么（原理及源码解析）"><span class="nav-number">2.2.</span> <span class="nav-text">为什么（原理及源码解析）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#从具体实例入手看原理：-程序内部的后台服务——-内部的跨进程通信-AM-amp-AMS"><span class="nav-number">2.2.1.</span> <span class="nav-text">从具体实例入手看原理： 程序内部的后台服务—— 内部的跨进程通信 AM &amp; AMS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AM是与AMS进行通信"><span class="nav-number">2.2.2.</span> <span class="nav-text">AM是与AMS进行通信</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AS和AMS联系的时机"><span class="nav-number">2.2.3.</span> <span class="nav-text">AS和AMS联系的时机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监听无障碍服务事件"><span class="nav-number">2.2.4.</span> <span class="nav-text">监听无障碍服务事件</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wizard wu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
