@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="提纲 是什么（Android App Bundles简介）  为什么使用（aab的四个新功能及实用性）  怎么使用（怎么进行aab的改造）  怎么测试（可以通过google市场测试  而本文主要介绍aab本地测试工具 Bundletool）   简介Android App Bundles（以下简称AAB）是2018年Google I&#x2F;O大会带来的一款全新动态化框架，与Instant App">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android App Bundle（谷歌官方动态化框架）">
+<meta property="og:url" content="https://whytry-gar.github.io/2021/06/15/Android%20App%20Bundle%EF%BC%88%E8%B0%B7%E6%AD%8C%E5%AE%98%E6%96%B9%E5%8A%A8%E6%80%81%E5%8C%96%E6%A1%86%E6%9E%B6%EF%BC%89/index.html">
+<meta property="og:site_name" content="wizard。">
+<meta property="og:description" content="提纲 是什么（Android App Bundles简介）  为什么使用（aab的四个新功能及实用性）  怎么使用（怎么进行aab的改造）  怎么测试（可以通过google市场测试  而本文主要介绍aab本地测试工具 Bundletool）   简介Android App Bundles（以下简称AAB）是2018年Google I&#x2F;O大会带来的一款全新动态化框架，与Instant App">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/daf2f8f1300c4d9c4f11949d1dac9786.gif">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/33bfbbe16032652fd691f85417a2296b.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/0dabb47581718e1483e8d30356d8869b.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/378c09a8db526f88eb133995d420c98f.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/e154cdfb3f28e644095706462f99af1a.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/df161f4e3ae7cf0ff80e99e909dd5eb0.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/b86573e632a8256a460f1efaa42e2456.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/1fa105cbd1a419caf5532b9cd6131679.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/e04c4bcffbae5ea1272b7d1722ae9e86.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/cb8e9f90eb0c92bda20d18763ec50e30.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/040be1b8f8ffd56447b351e92040d486.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/c4dedbb5303e9cb79c67709e1b1b83fc.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/056fafc8a6f094b7f8324e40646ac18c.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/ec6b02d36243cf17ee2315d1df745c8e.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/d54803aaf5656f11810552bbd976df70.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/0d9a85fb27a7b119b7ca7d01911f67d1.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/aa84387d8e71f12a565a7d5ade7c53dd.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/9035eba399f47a43a71b1aac29e968fd.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/fd8f1a82786d62f3a5435a2b5a62b9a8.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/bf4a91d913081f6b2f1212b478e35fbf.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/839028d0136a8b6fc8f1f8bbe4b1c221.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/c3e67d4bcd6c685299d0b3bdb8fb52d8.png">
+<meta property="og:image" content="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==">
+<meta property="article:published_time" content="2021-06-15T03:13:27.000Z">
+<meta property="article:modified_time" content="2021-06-15T04:13:01.131Z">
+<meta property="article:author" content="wizard wu">
+<meta property="article:tag" content="Android">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/img_convert/daf2f8f1300c4d9c4f11949d1dac9786.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://whytry-gar.github.io/2021/06/15/Android App Bundle（谷歌官方动态化框架）/"/>
+
+
+
+
+
+  <title>Android App Bundle（谷歌官方动态化框架） | wizard。</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">wizard。</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://whytry-gar.github.io/2021/06/15/Android%20App%20Bundle%EF%BC%88%E8%B0%B7%E6%AD%8C%E5%AE%98%E6%96%B9%E5%8A%A8%E6%80%81%E5%8C%96%E6%A1%86%E6%9E%B6%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wizard wu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wizard。">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android App Bundle（谷歌官方动态化框架）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-06-15T11:13:27+08:00">
+                2021-06-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <meta name="referrer" content="no-referrer"/>
+
+
+
+<h2 id="提纲"><a href="#提纲" class="headerlink" title="提纲"></a>提纲</h2><ul>
+<li><p>是什么（Android App Bundles简介）</p>
+</li>
+<li><p>为什么使用（aab的四个新功能及实用性）</p>
+</li>
+<li><p>怎么使用（怎么进行aab的改造）</p>
+</li>
+<li><p>怎么测试（可以通过google市场测试  而本文主要介绍aab本地测试工具 Bundletool）</p>
+</li>
+</ul>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fdeveloper.android.com%2Fplatform%2Ftechnology%2Fapp-bundle" target="_blank" rel="noopener">Android App Bundles</a>（以下简称AAB）是2018年Google I/O大会带来的一款全新动态化框架，与Instant App不同，AAB是借助Split Apk完成动态加载。AAB的技术特点如下：</p>
+<ol>
+<li><p>不同于传统的App以整个Apk为单位，一个App被分割成了一个base Apk和多个split Apk。</p>
+</li>
+<li><p>Apk在安装后，可以按需请求下发或者更新模块Apk。</p>
+</li>
+<li><p>split Apk可以根据配置进行更细的划分，并根据当前运行的设备特征来请求特定的Apk。</p>
+</li>
+<li><p>请求与安装过程必须通过Google Play商店进行，Google进一步统一标准和巩固自身生态。</p>
+</li>
+<li><p>split Apk功能只在Android 5.0(API 21)及以上机型使用，针对Android 4.4及以下机型Google Play商店仍会下发完整的Apk，以此来向下兼容。</p>
+</li>
+</ol>
+<p>以下是AAB运行时动态加载Apk与传统方式下发Apk的对比示意图：</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/daf2f8f1300c4d9c4f11949d1dac9786.gif" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>AAB是一个动态化框架，它是利用Android Framework提供的split apks功能完成。所有安装split apk工作均是通过IPC交由google play完成。</p>
+<p><strong>好处</strong></p>
+<ul>
+<li>Size 更小（最高可以减少 50% 应用体积）</li>
+<li>安装更快 （ base.apk + split apks）</li>
+<li>Android App Bundle 是单一工件，因此无需构建、签名或管理多个 APK</li>
+<li>支持动态发布 (为特定用户添加动态功能，而无需增加安装时的应用体积)</li>
+<li>官方提供的系统级插件化方案</li>
+</ul>
+<p><strong>限制和成本</strong></p>
+<ul>
+<li>仅限于通过 Google Play 发布的应用，（Google 进一步巩固自身生态）</li>
+<li>需要加入到 Google 的 beta program</li>
+<li>最低支持版本 Android 5.0 (API level 21)</li>
+<li>低于 Android 5.0 (API level 21) 的版本 GooglePlay 会优化 Size，但不支持动态交付。</li>
+<li>需要升级到 Android Studio 3.2 以上，修改工程结构以便支持 App Bundle 格式集成 Play Core Library</li>
+</ul>
+<p><strong>已知问题</strong></p>
+<ul>
+<li>不支持动态修改 resource tables</li>
+<li>在 dynamic feature 模块的清单文件里，不能引用不在 base 模块里的资源</li>
+<li>在 AS 中，更改 base 模块的 build variant，并不会自动更改依赖 base 的其他模块，所以构建时可能会报错</li>
+<li>不同模块 build configuration 不同，可能会有冲突，导致构建或运行时出错，比如 buildTypes.release.debuggable = true</li>
+<li>由于 AAB 可能包含多个 apk 文件，所以在把 apk 发送到设备时可能会因找不到资源，导致运行时异常，比如 adb刷机（ sideloading ）</li>
+<li>动态下载模块需要安装最新的 Play Store app，所以有很小概率下载 app 时会回滚为下载一个 multi-APK（为 Android 4.4以下设备提供）</li>
+</ul>
+<p>通过appbundle 很多应用都减少了较多的体积，平均减少体积为11%</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/33bfbbe16032652fd691f85417a2296b.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<h2 id="aab的四个新功能"><a href="#aab的四个新功能" class="headerlink" title="aab的四个新功能"></a>aab的四个新功能</h2><p><img src="https://img-blog.csdnimg.cn/img_convert/0dabb47581718e1483e8d30356d8869b.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<h3 id="应用内更新：即时or灵活"><a href="#应用内更新：即时or灵活" class="headerlink" title="应用内更新：即时or灵活"></a>应用内更新：即时or灵活</h3><p><img src="https://img-blog.csdnimg.cn/img_convert/378c09a8db526f88eb133995d420c98f.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>两种更新方式</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/e154cdfb3f28e644095706462f99af1a.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>即时更新，在应用内直接触发模块更新，用户停留在更新流程中直到更新完成。确认更新-更新下载，下载完成，安装（google管理流程）-继续使用</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/df161f4e3ae7cf0ff80e99e909dd5eb0.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>灵活更新：提示用户有新的更新-用户确认更新-google管理进行下载，下载的时候用户正常使用app-下载完成以后google提示重启，使用新的app</p>
+<h3 id="按条件分发-根据国家，版本，机型是否有什么功能的维度，在安装时将模块发给用户"><a href="#按条件分发-根据国家，版本，机型是否有什么功能的维度，在安装时将模块发给用户" class="headerlink" title="按条件分发 根据国家，版本，机型是否有什么功能的维度，在安装时将模块发给用户"></a>按条件分发 根据国家，版本，机型是否有什么功能的维度，在安装时将模块发给用户</h3><p><img src="https://img-blog.csdnimg.cn/img_convert/b86573e632a8256a460f1efaa42e2456.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>指定国家，版本，是否有ar功能等</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/1fa105cbd1a419caf5532b9cd6131679.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>指定参数，版本，功能</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/e04c4bcffbae5ea1272b7d1722ae9e86.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>指定国家</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/cb8e9f90eb0c92bda20d18763ec50e30.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<h3 id="按需分发-根据场景，需要用到功能时，才分发相应模块给用户安装"><a href="#按需分发-根据场景，需要用到功能时，才分发相应模块给用户安装" class="headerlink" title="按需分发 根据场景，需要用到功能时，才分发相应模块给用户安装"></a>按需分发 根据场景，需要用到功能时，才分发相应模块给用户安装</h3><p>定制应用的哪个功能，在什么时候，发给什么用户。如对于有上传需求的用户，需要上传时，才分发上传的功能模块</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/040be1b8f8ffd56447b351e92040d486.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>示例1：在app内提示下载相关模块和进行安装</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/c4dedbb5303e9cb79c67709e1b1b83fc.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>示例2：安装时有新手模块，运行后续卸载新手模块</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/056fafc8a6f094b7f8324e40646ac18c.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>按需请求模块关键代码</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/ec6b02d36243cf17ee2315d1df745c8e.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>按需删除模块（模块卸载不会立即发生。也就是说，设备会根据需要在后台卸载它们，以节省存储空间）</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/d54803aaf5656f11810552bbd976df70.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>Play Feature Delivery 概览 使用功能模块实现自定义分发</p>
+<p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fdeveloper.android.google.cn%2Fguide%2Fapp-bundle%2Fplay-feature-delivery" target="_blank" rel="noopener">https://developer.android.google.cn/guide/app-bundle/play-feature-delivery</a></p>
+<p>处理请求错误</p>
+<p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fdeveloper.android.google.cn%2Fguide%2Fplaycore%2Fplay-feature-delivery%23handle_request_errors" target="_blank" rel="noopener">https://developer.android.google.cn/guide/playcore/play-feature-delivery#handle_request_errors</a></p>
+<h3 id="游戏资源分发-：根据设备分发"><a href="#游戏资源分发-：根据设备分发" class="headerlink" title="游戏资源分发 ：根据设备分发"></a>游戏资源分发 ：根据设备分发</h3><p>游戏可以大到1gb，或者分更多的资源包</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/0d9a85fb27a7b119b7ca7d01911f67d1.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>为什么比cdn分发好</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/aa84387d8e71f12a565a7d5ade7c53dd.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<h2 id="怎么进行aab的改造"><a href="#怎么进行aab的改造" class="headerlink" title="怎么进行aab的改造"></a>怎么进行aab的改造</h2><p><img src="https://img-blog.csdnimg.cn/img_convert/9035eba399f47a43a71b1aac29e968fd.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p><strong>Codelab</strong></p>
+<p>按需模块，可帮助您打造按需下载和安装功能的应用。</p>
+<p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fdeveloper.android.com%2Fcodelabs%2Fon-demand-dynamic-delivery" target="_blank" rel="noopener">https://developer.android.com/codelabs/on-demand-dynamic-delivery</a></p>
+<p>在您的项目中添加 Play Core 库</p>
+<p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fdeveloper.android.google.cn%2Fguide%2Fplaycore%2Fplay-feature-delivery%23include_playcore" target="_blank" rel="noopener">https://developer.android.google.cn/guide/playcore/play-feature-delivery#include_playcore</a></p>
+<p>Play Feature Delivery 概览 使用功能模块实现自定义分发</p>
+<p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fdeveloper.android.google.cn%2Fguide%2Fapp-bundle%2Fplay-feature-delivery" target="_blank" rel="noopener">https://developer.android.google.cn/guide/app-bundle/play-feature-delivery</a></p>
+<h2 id="测试工具-Bundletool-介绍"><a href="#测试工具-Bundletool-介绍" class="headerlink" title="测试工具 Bundletool 介绍"></a>测试工具 Bundletool 介绍</h2><p><strong>aab可以上传google市场进行测试（需要开发者账号），本地测试可以用这个工具来进行</strong></p>
+<p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2Fgoogle%2Fbundletool" target="_blank" rel="noopener">Bundletool</a>是一个用于处理 Android App Bundle 的命令行工具。使用 bundletool，您可以构建 AAB，提取连接的设备配置，生成 APK Set 文件 (.apks)，从 APK Set 文件中提取或安装 APK，以及验证 App Bundle。由于 AAB 仅是一种发布格式，因此 bundletool 用于生成和测试 APK。</p>
+<p><strong>构建aab</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/fd8f1a82786d62f3a5435a2b5a62b9a8.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>用 Bundletool 工具测试 AAB</p>
+<p>\1. 下载 bundletool：下载地址<a href="https://github.com/google/bundletool/releases/tag/1.6.0" target="_blank" rel="noopener">https://github.com/google/bundletool/releases/tag/1.6.0</a> </p>
+<p>\2. 切换到 aab 所在文件夹，生成 apks 文件</p>
+<p><strong>bundletool build-apks –bunlde=[bundle_name].aab –output=./[bundle_name].apks</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/bf4a91d913081f6b2f1212b478e35fbf.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/839028d0136a8b6fc8f1f8bbe4b1c221.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>\3. 如果要 build 签名的 apks 文件，则需要加上 keystore 设置</p>
+<p><strong>bundletool build-apks –bundle=.aab –output=.apks –ks=[your_keystorename].jks/.keystore –ks-pass=pass: [your_keystore_pass] –ks-key-alias=[your_keystore_alias] –key-pass=pass:[your_keystore_pass]</strong></p>
+<p>\4. 将 apks 安装在当前连接的设备上</p>
+<p><strong>bundletool install-apks –apks=[bundle_name].apks</strong></p>
+<p>可以看到只有对应的几个apk安装到设备中</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/c3e67d4bcd6c685299d0b3bdb8fb52d8.png" alt="img">)<img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>另外介绍几个有用的功能：</p>
+<p>- 输出当前设备对应的设备信息</p>
+<p><strong>bundletool get-device-spec –output=tcl.json –adb=/Library/Android_sdk/platform-tools/adb</strong></p>
+<p>- 生成当前设备对应的 apks</p>
+<p><strong>bundletool build-apks –connected-device –bundle=app.aab –output=./app1.apks –adb=/Library/Android_sdk/platform-tools/adb</strong></p>
+<p>- 根据aab文件生成一个全量apk</p>
+<p><strong>bundletool-all-0.10.3.jar build-apks –bundle=app.aab –output=all.apks –mode=universal</strong></p>
+<p>- 更多命令集合</p>
+<p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fblog.csdn.net%2Fjavaniceyou%2Farticle%2Fdetails%2F107714732" target="_blank" rel="noopener">https://blog.csdn.net/javaniceyou/article/details/107714732</a></p>
+<p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fdeveloper.android.google.cn%2Fguide%2Fapp-bundle%2Ftest%2Ftesting-fakesplitinstallmanager" target="_blank" rel="noopener">在本地测试功能分发选项</a></p>
+<p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fdeveloper.android.google.cn%2Fguide%2Fapp-bundle%2Ftest%2Ftesting-fakesplitinstallmanager" target="_blank" rel="noopener">https://developer.android.google.cn/guide/app-bundle/test/testing-fakesplitinstallmanager</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>Android App Bundle探索</p>
+<p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fblog.csdn.net%2Fqq_34519487%2Farticle%2Fdetails%2F104060327%3Futm_medium%3Ddistribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-8.control%26depth_1-utm_source%3Ddistribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-8.control" target="_blank" rel="noopener">https://blog.csdn.net/qq_34519487/article/details/104060327?utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-8.control&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-8.control</a></p>
+<p><strong>Android App Bundle解析</strong></p>
+<p><a href="https://zhuanlan.zhihu.com/p/86995941" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/86995941</a></p>
+<p><strong>Android新特性——App Bundles</strong></p>
+<p><a href="https://blog.csdn.net/kdsde/article/details/104002500" target="_blank" rel="noopener">https://blog.csdn.net/kdsde/article/details/104002500</a></p>
+<h2 id="视频介绍地址"><a href="#视频介绍地址" class="headerlink" title="视频介绍地址"></a>视频介绍地址</h2><p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fwww.bilibili.com%2Fvideo%2FBV1nJ411w7p3%3Ffrom%3Dsearch%26seid%3D9721899851768761615" target="_blank" rel="noopener">https://www.bilibili.com/video/BV1nJ411w7p3?from=search&amp;seid=9721899851768761615</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    wizard wu
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://whytry-gar.github.io/2021/06/15/Android%20App%20Bundle%EF%BC%88%E8%B0%B7%E6%AD%8C%E5%AE%98%E6%96%B9%E5%8A%A8%E6%80%81%E5%8C%96%E6%A1%86%E6%9E%B6%EF%BC%89/" title="Android App Bundle（谷歌官方动态化框架）">https://whytry-gar.github.io/2021/06/15/Android%20App%20Bundle%EF%BC%88%E8%B0%B7%E6%AD%8C%E5%AE%98%E6%96%B9%E5%8A%A8%E6%80%81%E5%8C%96%E6%A1%86%E6%9E%B6%EF%BC%89/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/05/21/%E8%AF%A6%E8%A7%A3%E5%AE%89%E5%8D%93%E8%BE%85%E5%8A%A9%E5%8A%9F%E8%83%BD%E6%9C%8D%E5%8A%A1%EF%BC%88%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1%EF%BC%8C%E5%BE%AE%E4%BF%A1%E6%8A%A2%E7%BA%A2%E5%8C%85%E5%8A%A9%E6%89%8B%E5%8E%9F%E7%90%86%EF%BC%89/" rel="next" title="详解安卓辅助功能服务（无障碍服务，微信抢红包助手原理）">
+                <i class="fa fa-chevron-left"></i> 详解安卓辅助功能服务（无障碍服务，微信抢红包助手原理）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.jpg"
+                alt="wizard wu" />
+            
+              <p class="site-author-name" itemprop="name">wizard wu</p>
+              <p class="site-description motion-element" itemprop="description">日夜兼程，为了看更多更好的风景</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/whytry-GAR" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#提纲"><span class="nav-number">1.</span> <span class="nav-text">提纲</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">2.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aab的四个新功能"><span class="nav-number">3.</span> <span class="nav-text">aab的四个新功能</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#应用内更新：即时or灵活"><span class="nav-number">3.1.</span> <span class="nav-text">应用内更新：即时or灵活</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#按条件分发-根据国家，版本，机型是否有什么功能的维度，在安装时将模块发给用户"><span class="nav-number">3.2.</span> <span class="nav-text">按条件分发 根据国家，版本，机型是否有什么功能的维度，在安装时将模块发给用户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#按需分发-根据场景，需要用到功能时，才分发相应模块给用户安装"><span class="nav-number">3.3.</span> <span class="nav-text">按需分发 根据场景，需要用到功能时，才分发相应模块给用户安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#游戏资源分发-：根据设备分发"><span class="nav-number">3.4.</span> <span class="nav-text">游戏资源分发 ：根据设备分发</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#怎么进行aab的改造"><span class="nav-number">4.</span> <span class="nav-text">怎么进行aab的改造</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试工具-Bundletool-介绍"><span class="nav-number">5.</span> <span class="nav-text">测试工具 Bundletool 介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#视频介绍地址"><span class="nav-number">7.</span> <span class="nav-text">视频介绍地址</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wizard wu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
